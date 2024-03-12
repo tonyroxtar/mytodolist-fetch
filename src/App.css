@@ -1,0 +1,41 @@
+body {
+  background: rgb(107, 107, 107);
+  font-family: 'Afacad', sans-serif;
+}
+.container {
+  display: inline-flex;
+  flex-direction: column;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+  font-size: 4rem;
+  background: rgb(223, 209, 17);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+.title {
+  font-size: 6rem;
+  text-align: center;
+}
+
+.input {
+  text-align: center;
+  border: none;
+  outline: none;
+  background: rgb(228, 228, 228);
+  width: 100%;
+  border-radius: 1rem;
+}
+
+::placeholder{
+  text-align: center;
+}
+
+.tasksContainer{
+  padding-top: 1rem;
+}
+
+.tasksRemaining {
+  padding-top: 1rem;
+}
