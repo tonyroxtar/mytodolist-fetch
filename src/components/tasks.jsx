@@ -2,7 +2,7 @@ const Tasks = ({ tasks, handleOnClick, handleOnHover, hoveredTask }) => {
   return (
     <>
       <div className="tasksContainer">
-        {tasks.length > 0
+        {tasks?.length > 0
           ? tasks.map((tasks, index) => {
               return (
                 <p
@@ -10,7 +10,7 @@ const Tasks = ({ tasks, handleOnClick, handleOnHover, hoveredTask }) => {
                   onMouseEnter={() => handleOnHover(index)}
                   onMouseLeave={() => handleOnHover(null)}
                 >
-                  {tasks}{" "}
+                  {tasks.label}{" "}
                   {index === hoveredTask && (
                     <i
                       className="fa-regular fa-trash-can float-end"
@@ -23,7 +23,7 @@ const Tasks = ({ tasks, handleOnClick, handleOnHover, hoveredTask }) => {
           : "No tasks so far, add one!"}
       </div>
       <p className="tasksRemaining">
-        <i className="fa-regular fa-rectangle-list"></i> You have {tasks.length}{" "}
+        <i className="fa-regular fa-rectangle-list"></i> You have {tasks?.length}{" "}
         tasks left
       </p>
     </>

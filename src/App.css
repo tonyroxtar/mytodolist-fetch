@@ -39,3 +39,20 @@ body {
 .tasksRemaining {
   padding-top: 1rem;
 }
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-lg {
+  border-radius: 1rem;
+  background: rgb(21, 25, 29);
+  color: whitesmoke;
+  padding-inline: 1rem;
+}
+
+.btn-lg:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
