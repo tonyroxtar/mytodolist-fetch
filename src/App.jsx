@@ -4,8 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "./App.css";
-import Input from "./components/Input";
-import Tasks from "./components/Tasks";
+import Input from "./components/input";
+import Tasks from "./components/tasks";
 
 function App() {
   const [input, setInput] = useState("");
