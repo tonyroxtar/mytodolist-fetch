@@ -7,6 +7,8 @@ import "./App.css";
 import Input from "./components/input";
 import Tasks from "./components/tasks";
 
+const API_BASE_URL = "https://playground.4geeks.com/todo";
+
 function App() {
   const [input, setInput] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -18,29 +20,16 @@ function App() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && input.trim()) {
       const newTask = { label: input, done: false };
-      setTasks([...tasks, newTask]);
+      createTask(newTask);
       setInput("");
-
-      fetch("https://playground.4geeks.com/apis/fake/todos/user/tonyroxtar", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([...tasks, newTask]),
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((error) => {
-          console.error("error updating tasks:", error);
-        });
     }
   };
 
   const handleOnClick = (index) => {
+    const taskToDelete = tasks[index];
+    deleteTask(taskToDelete.id);
     setTasks(tasks.filter((task, currentIndex) => index !== currentIndex));
   };
 
@@ -48,89 +37,123 @@ function App() {
     setHoveredTask(index === hoveredTask ? null : index);
   };
 
-  
-
-  const handleStartList = () => {
-    if (userExists) {
-      return;
-    }
-
-    const notify = () => toast("user created");
-
-    fetch("https://playground.4geeks.com/apis/fake/todos/user/tonyroxtar", {
+  const createTask = (task) => {
+    fetch (`${API_BASE_URL}/todos/tonyroxtar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify([]),
+      body: JSON.stringify(task),
     })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        notify(data);
-        setUserExists(true);
-      })
-      .catch((error) => {
-        console.log("error creating user:", error);
-      });
+    .then ((response) => response.json())
+    .then ((data) => {
+      console.log(data);
+      setTasks([...tasks, { ...task, id: data.id }]);
+      toast("Task created");
+    })
+    .catch((error) => {
+      console.error("Error creating task:", error);
+    });
+  };
+  
+  const updateTask = (taskId, updateTask) => {
+    fetch(`${API_BASE_URL}/todos/${taskId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateTask),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      setTasks(tasks.map((task) => (task.id === taskId ? updateTask : task)));
+      toast("Task updated");
+    })
+    .catch((error) => {
+      console.error("Error updating task:", error);
+    });
   };
 
-  const handleFinishList = () => {
-
-    const notify = () => toast("user deleted");
-
-    fetch("https://playground.4geeks.com/apis/fake/todos/user/tonyroxtar", {
+  const deleteTask = (taskId) => {
+    fetch(`${API_BASE_URL}/todos/${taskId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     })
-      .then((response) => {
-        return response.json();
+    .then((response) => {
+      if (!response.ok) {
+        return response.text().then((text) => {
+          const error = text ? JSON.parse(text) : { detail: [{ msg: "Unknown error ocurred"}] };
+          throw new Error(error.detail.map(err => err.msg).join(", "));
+        });
+      }
+      return response.text();
+    })
+    .then((text) => {
+      console.log(text);
+      setTasks(tasks.filter((task) => task.id !== taskId));
+      toast("Task deleted");
+    })
+    .catch((error) => {
+      console.error("Error deleting task:", error);
+    });
+  };
+        
+const handleStartList = () => {
+  if (userExists) {
+    return;
+  }
+
+  fetch(`${API_BASE_URL}/users/tonyroxtar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify([]),
       })
-      .then((data) => {
-        console.log(data);
-        notify(data);
-        setUserExists(false);
-      })
-      .catch((error) => {
-        console.error("failed to delete user", error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          toast("User created");
+          setUserExists(true);
+        })
+        .catch((error) => {
+          console.error("Error creating user:", error);
+        });
+    };
+
+  const handleFinishList = () => {
+    fetch(`${API_BASE_URL}/users/tonyroxtar`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => {
+      if(!response.ok) {
+        return response.text().then((text) => {
+          const error = text ? JSON.parse(text) : { detail: [{ msg: "Unknown error ocurred"}] };
+          throw new Error(error.detail.map(err => err.msg).join(", "));
+        });
+      }
+      return response.text();
+    })
+    .then((text) => {
+      console.log(text);
+      toast("User deleted");
+      setUserExists(false);
+    })
+    .catch((error) => {
+      console.error("Error deleting user:", error);
+    })
   };
 
   useEffect(() => {
-    fetch("https://playground.4geeks.com/apis/fake/todos/user/tonyroxtar", {
+    fetch(`${API_BASE_URL}/users/tonyroxtar`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
-      .then((response) => {
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
-        setTasks(data);
+        setTasks(data.map((task, index) => ({ ...task, id: index })));
         console.log(data);
       })
       .catch((error) => {
         console.log(error);
       });
   }, []);
-
-  useEffect(() => {
-    if (tasks.length > 0) {
-      fetch("https://playground.4geeks.com/apis/fake/todos/user/tonyroxtar", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tasks),
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((error) => {
-          console.error("Error updating tasks:", error);
-        });
-    }
-  }, [tasks]);
 
   return (
     <>
